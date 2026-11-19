@@ -130,7 +130,14 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.1/howto/static-files/
 
 STATIC_URL = 'static/'
+STATICFILES_DIRS = [
+    BASE_DIR / 'static'
+]
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
+LOGIN_URL = 'accounts:login'
+LOGIN_REDIRECT_URL = 'accounts:register'
+LOGOUT_REDIRECT_URL = 'accounts:login'
 
 # Email
 # https://docs.djangoproject.com/en/6.1/topics/email/#topic-email-configuration

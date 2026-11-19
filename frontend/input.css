@@ -1,0 +1,29 @@
+@import "tailwindcss" source(none);
+
+/* Paths are relative to this stylesheet. Include root and app templates. */
+@source "../templates/**/*.html";
+@source "../**/templates/**/*.html";
+@source not "../node_modules";
+@source not "../.venv";
+@source not "../venv";
+@source not "../staticfiles";
+
+/* Unlayered styles preserve the original overrides of Tailwind utilities. */
+body { background: #0b1017; color: #e2e8f0; font-family: ui-sans-serif, system-ui, sans-serif; }
+:focus-visible { outline: 2px solid #5eead4; outline-offset: 4px; }
+.argus-grid { background-image: linear-gradient(#ffffff04 1px, transparent 1px), linear-gradient(90deg, #ffffff04 1px, transparent 1px); background-size: 40px 40px; }
+.form-field input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]),
+.form-field select, .form-field textarea {
+    display: block; width: 100%; min-width: 0; border: 1px solid #334155;
+    border-radius: .65rem; background: #0b1017; padding: .7rem .85rem;
+    color: #f1f5f9; font: inherit; font-size: .875rem;
+}
+.form-field input:focus, .form-field select:focus, .form-field textarea:focus {
+    border-color: #5eead4; outline: 2px solid #5eead433; outline-offset: 2px;
+}
+.form-field.has-errors input, .form-field.has-errors select, .form-field.has-errors textarea { border-color: #fb7185; }
+.field-help { color: #94a3b8; font-size: .75rem; line-height: 1.6; overflow-wrap: anywhere; }
+.field-help ul { list-style: disc; padding-left: 1rem; margin-top: .35rem; }
+.field-help a { color: #5eead4; text-decoration: underline; }
+.field-errors { color: #fda4af; font-size: .8rem; line-height: 1.5; overflow-wrap: anywhere; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; } }

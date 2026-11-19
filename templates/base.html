@@ -1,0 +1,42 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" class="h-full" style="color-scheme: dark;">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Argus Monitoring — website uptime monitoring and incident management.">
+    <title>{% block title %}Argus Monitoring{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/tailwind.css' %}">
+    {% block extra_styles %}{% endblock %}
+</head>
+<body class="flex min-h-screen flex-col antialiased">
+    <a href="#main-content" class="sr-only z-50 rounded-lg bg-teal-300 px-4 py-3 text-slate-950 focus:not-sr-only focus:absolute focus:left-4 focus:top-4">Skip to content</a>
+    <header class="border-b border-white/8 bg-[#0b1017]/95">
+        <nav aria-label="Main navigation" class="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-5 py-5 sm:px-8">
+            <a href="{% url 'accounts:register' %}" class="flex items-center gap-3 rounded-sm" aria-label="Argus Monitoring registration">
+                <span class="flex h-9 w-9 items-center justify-center rounded-xl border border-teal-300/25 bg-teal-300/10 text-teal-300" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="h-6 w-6"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>
+                </span>
+                <span class="text-lg font-semibold tracking-tight">argus<span class="ml-2 text-xs font-normal tracking-wide text-slate-400">MONITORING</span></span>
+            </a>
+            {% if user.is_authenticated %}
+                <form method="post" action="{% url 'accounts:logout' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="cursor-pointer rounded-lg border border-white/15 px-4 py-2 text-sm font-medium text-slate-200 transition hover:border-teal-300/50 hover:text-teal-200">Logout</button>
+                </form>
+            {% else %}
+                <a href="{% url 'accounts:register' %}" aria-current="{% block registration_current %}false{% endblock %}" class="rounded-lg border border-white/15 px-4 py-2 text-sm font-medium text-slate-200 transition hover:border-teal-300/50 hover:text-teal-200">Create account <span aria-hidden="true" class="ml-2">↗</span></a>
+            {% endif %}
+        </nav>
+    </header>
+    <main id="main-content" tabindex="-1" class="flex flex-1 flex-col">
+        {% block content %}{% endblock %}
+    </main>
+    <footer class="border-t border-white/8">
+        <div class="mx-auto flex max-w-7xl flex-col justify-between gap-3 px-5 py-6 text-xs text-slate-400 sm:flex-row sm:px-8">
+            <p>&copy; {% now "Y" %} Argus Monitoring</p>
+            <p>Website uptime. Clear incidents. Peace of mind.</p>
+        </div>
+    </footer>
+</body>
+</html>
