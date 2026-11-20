@@ -2,6 +2,8 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.db.models.functions import Lower
 
+from accounts.choices import fetch_timezone_choices
+
 
 class User(AbstractUser):
     display_name = models.CharField(
@@ -10,6 +12,7 @@ class User(AbstractUser):
     )
     timezone = models.CharField(
         max_length=50,
+        choices=fetch_timezone_choices,
         default='UTC'
     )
     email = models.EmailField(
