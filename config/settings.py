@@ -35,7 +35,8 @@ ALLOWED_HOSTS = os.getenv('DJANGO_ALLOWED_HOSTS', '').split(',')
 
 # Application definition
 PROJECT_APPS = [
-    'accounts'
+    'accounts',
+    'monitors'
 ]
 
 INSTALLED_APPS = [
