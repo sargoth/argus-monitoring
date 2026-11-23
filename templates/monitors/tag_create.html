@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Create Tag · Argus Monitoring{% endblock %}
+
+{% block content %}
+<section aria-labelledby="tag-create-heading" class="relative flex flex-1 items-center overflow-hidden">
+    <div aria-hidden="true" class="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(45,212,191,0.08),transparent_60%)]"></div>
+    <div class="relative mx-auto grid w-full max-w-7xl items-center gap-12 px-5 py-12 sm:px-8 sm:py-16 lg:grid-cols-2 lg:gap-20 lg:py-20">
+        <div class="min-w-0">
+            <p class="mb-3 text-xs font-semibold uppercase tracking-[0.16em] text-teal-300">Your monitoring workspace</p>
+            <h1 id="tag-create-heading" class="text-4xl font-semibold tracking-tight text-white sm:text-5xl">Create Tag</h1>
+            <p class="mt-6 max-w-md text-base leading-relaxed text-slate-400">Bring clarity to your workspace. Tags help you organize monitors by service, environment, or team so you can find what matters at a glance.</p>
+        </div>
+
+        <div class="min-w-0 rounded-2xl border border-white/10 bg-[#111923] p-6 shadow-2xl shadow-black/20 sm:p-8" aria-labelledby="tag-details-heading">
+            <h2 id="tag-details-heading" class="text-2xl font-semibold tracking-tight text-white">Tag details</h2>
+            <p class="mt-2 text-sm leading-relaxed text-slate-400">Choose a clear name and a color that's easy to recognize.</p>
+
+            <form method="post" action="{% url 'monitors:create_tag' %}" class="mt-7 space-y-5">
+                {% csrf_token %}
+                {% if form.non_field_errors %}
+                    <div role="alert" class="rounded-lg border border-rose-400/30 bg-rose-400/10 p-4 text-sm text-rose-200">
+                        <p class="mb-2 font-medium">Please review your tag details.</p>
+                        <ul class="list-inside list-disc space-y-1">
+                            {% for error in form.non_field_errors %}<li>{{ error }}</li>{% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+
+                <div role="group" aria-labelledby="tag-name-label" aria-describedby="tag-name-help" class="form-field{% if form.name.errors %} has-errors{% endif %}">
+                    <label id="tag-name-label" for="{{ form.name.id_for_label }}" class="mb-2 block text-sm font-medium text-slate-200">Name{% if form.name.field.required %}<span class="ml-1 text-teal-300" aria-hidden="true">*</span>{% endif %}</label>
+                    {{ form.name }}
+                    {% if form.name.errors %}
+                        <div id="{{ form.name.auto_id }}_error" class="field-errors mt-2" role="alert">
+                            <ul class="space-y-1">{% for error in form.name.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+                        </div>
+                    {% endif %}
+                    <p id="tag-name-help" class="field-help mt-2">Use a short, descriptive name, such as Production, API, or Customer websites.</p>
+                    {% if form.name.help_text %}<div id="{{ form.name.auto_id }}_helptext" class="field-help mt-2">{{ form.name.help_text|safe }}</div>{% endif %}
+                </div>
+
+                <div role="group" aria-labelledby="tag-color-label" aria-describedby="tag-color-help">
+                    <label id="tag-color-label" for="{{ form.color.id_for_label }}" class="mb-2 block text-sm font-medium text-slate-200">Color{% if form.color.field.required %}<span class="ml-1 text-teal-300" aria-hidden="true">*</span>{% endif %}</label>
+                    <div class="[&_input]:block [&_input]:h-14 [&_input]:w-full [&_input]:min-w-0 [&_input]:cursor-pointer [&_input]:rounded-xl [&_input]:border [&_input]:bg-[#0b1017] [&_input]:p-2 [&_input:focus-visible]:outline-teal-200 {% if form.color.errors %}[&_input]:border-rose-400{% else %}[&_input]:border-slate-700{% endif %}">
+                        {{ form.color }}
+                    </div>
+                    {% if form.color.errors %}
+                        <div id="{{ form.color.auto_id }}_error" class="field-errors mt-2" role="alert">
+                            <ul class="space-y-1">{% for error in form.color.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+                        </div>
+                    {% endif %}
+                    <p id="tag-color-help" class="field-help mt-2">Select the swatch to open your device's color picker. Choose a color to help identify this tag across your monitors.</p>
+                    {% if form.color.help_text %}<div id="{{ form.color.auto_id }}_helptext" class="field-help mt-2">{{ form.color.help_text|safe }}</div>{% endif %}
+                </div>
+
+                <p class="text-xs text-slate-400"><span class="text-teal-300" aria-hidden="true">*</span> Required fields</p>
+                <div class="flex flex-col gap-3 border-t border-white/8 pt-6 sm:flex-row">
+                    <button type="submit" class="flex w-full cursor-pointer items-center justify-center rounded-xl bg-teal-300 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-teal-200 focus-visible:outline-teal-200">Create Tag</button>
+                    <a href="{% url 'accounts:profile' %}" class="flex w-full items-center justify-center rounded-xl border border-white/15 px-5 py-3 text-sm font-medium text-slate-200 transition hover:border-teal-300/50 hover:text-teal-200">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}Your Tags · Argus Monitoring{% endblock %}
+
+{% block content %}
+<section aria-labelledby="tags-heading" class="relative flex flex-1 overflow-hidden">
+    <div aria-hidden="true" class="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(45,212,191,0.08),transparent_60%)]"></div>
+    <div class="relative mx-auto w-full max-w-7xl px-5 py-12 sm:px-8 sm:py-16 lg:py-20">
+        <div class="flex flex-col justify-between gap-6 sm:flex-row sm:items-center">
+            <div class="min-w-0">
+                <p class="mb-3 text-xs font-semibold uppercase tracking-[0.16em] text-teal-300">Your monitoring workspace</p>
+                <h1 id="tags-heading" class="text-4xl font-semibold tracking-tight text-white sm:text-5xl">Your Tags</h1>
+                <p class="mt-4 max-w-lg text-base leading-relaxed text-slate-400">Organize your monitors by service, environment, or team with clear names and recognizable colors.</p>
+            </div>
+            <a href="{% url 'monitors:create_tag' %}" class="inline-flex shrink-0 items-center justify-center gap-3 rounded-xl bg-teal-300 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-teal-200 focus-visible:outline-teal-200"><span aria-hidden="true">+</span> Create Tag</a>
+        </div>
+
+        <div class="mt-9 min-w-0 overflow-hidden rounded-2xl border border-white/10 bg-[#111923] shadow-2xl shadow-black/20">
+            <div class="border-b border-white/8 px-6 py-5 sm:px-8">
+                <h2 id="tag-list-heading" class="text-lg font-semibold tracking-tight text-white">Tag library</h2>
+                <p class="mt-2 text-sm text-slate-400">A little structure for everything you monitor.</p>
+            </div>
+
+            <ul aria-labelledby="tag-list-heading" class="divide-y divide-white/8">
+                {% for tag in tags %}
+                    <li class="px-6 py-5 transition hover:bg-white/[0.02] sm:px-8">
+                        <div class="grid min-w-0 gap-4 sm:grid-cols-3 sm:items-center lg:gap-8">
+                            <div class="flex min-w-0 items-center gap-3">
+                                <span aria-hidden="true" class="h-4 w-4 shrink-0 rounded-full border border-white/25" style="background-color: {{ tag.color }};"></span>
+                                <h3 class="min-w-0 text-base font-medium text-slate-200 [overflow-wrap:anywhere]">{{ tag.name }}</h3>
+                            </div>
+                            <dl class="grid min-w-0 grid-cols-2 gap-4 sm:col-span-2 lg:gap-8">
+                                <div class="min-w-0">
+                                    <dt class="text-xs font-medium text-slate-400">Color</dt>
+                                    <dd class="mt-2 font-mono text-sm text-slate-200 [overflow-wrap:anywhere]">{{ tag.color }}</dd>
+                                </div>
+                                <div class="min-w-0">
+                                    <dt class="text-xs font-medium text-slate-400">Created</dt>
+                                    <dd class="mt-2 text-sm text-slate-200"><time datetime="{{ tag.created_at|date:'c' }}">{{ tag.created_at|date:"M j, Y" }}</time></dd>
+                                </div>
+                            </dl>
+                        </div>
+                    </li>
+                {% empty %}
+                    <li class="px-6 py-12 text-center sm:px-8 sm:py-16">
+                        <span aria-hidden="true" class="mx-auto flex h-12 w-12 items-center justify-center rounded-xl border border-teal-300/25 bg-teal-300/10 text-teal-300">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="h-6 w-6"><path d="M20 13 13 20a2 2 0 0 1-2.8 0L3 12.8V3h9.8l7.2 7.2a2 2 0 0 1 0 2.8Z"/><circle cx="7.5" cy="7.5" r="1"/></svg>
+                        </span>
+                        <h3 class="mt-5 text-lg font-semibold text-white">Your first tag starts here</h3>
+                        <p class="mx-auto mt-2 max-w-md text-sm leading-relaxed text-slate-400">No tags yet. Create one for an environment, service, or team to give your monitors a little more structure.</p>
+                        <a href="{% url 'monitors:create_tag' %}" class="mt-6 inline-flex items-center justify-center rounded-xl bg-teal-300 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-teal-200 focus-visible:outline-teal-200">Create your first tag</a>
+                    </li>
+                {% endfor %}
+            </ul>
+
+            {% if is_paginated %}
+                <nav aria-label="Tag pagination" class="flex flex-col items-center justify-between gap-4 border-t border-white/8 px-6 py-5 sm:flex-row sm:px-8">
+                    <p class="text-sm text-slate-400">Showing {{ page_obj.start_index }}–{{ page_obj.end_index }} of {{ paginator.count }} tags</p>
+                    <div class="flex flex-wrap items-center justify-center gap-3">
+                        {% if page_obj.has_previous %}
+                            <a href="{% url 'monitors:list_tags' %}?page={{ page_obj.previous_page_number }}" rel="prev" class="inline-flex min-h-11 items-center justify-center rounded-lg border border-white/15 px-4 py-2 text-sm font-medium text-slate-200 transition hover:border-teal-300/50 hover:text-teal-200">Previous</a>
+                        {% endif %}
+                        <span aria-current="page" class="rounded-lg border border-teal-300/25 bg-teal-300/10 px-4 py-3 text-sm font-medium text-teal-200">Page {{ page_obj.number }} of {{ paginator.num_pages }}</span>
+                        {% if page_obj.has_next %}
+                            <a href="{% url 'monitors:list_tags' %}?page={{ page_obj.next_page_number }}" rel="next" class="inline-flex min-h-11 items-center justify-center rounded-lg border border-white/15 px-4 py-2 text-sm font-medium text-slate-200 transition hover:border-teal-300/50 hover:text-teal-200">Next</a>
+                        {% endif %}
+                    </div>
+                </nav>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}
