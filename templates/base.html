@@ -7,26 +7,36 @@
     <meta name="description" content="Argus Monitoring — website uptime monitoring and incident management.">
     <title>{% block title %}Argus Monitoring{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'css/tailwind.css' %}">
+    <style>
+        .delete-action { background-color: #fda4af; color: #0f172a; }
+        .delete-action:hover { background-color: #fecdd3; }
+    </style>
     {% block extra_styles %}{% endblock %}
 </head>
 <body class="flex min-h-screen flex-col antialiased">
     <a href="#main-content" class="sr-only z-50 rounded-lg bg-teal-300 px-4 py-3 text-slate-950 focus:not-sr-only focus:absolute focus:left-4 focus:top-4">Skip to content</a>
     <header class="border-b border-white/8 bg-[#0b1017]/95">
         <nav aria-label="Main navigation" class="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-5 py-5 sm:px-8">
-            <a href="{% url 'accounts:register' %}" class="flex items-center gap-3 rounded-sm" aria-label="Argus Monitoring registration">
+            <a href="{% url 'home' %}" class="flex items-center gap-3 rounded-sm" aria-label="Argus Monitoring home">
                 <span class="flex h-9 w-9 items-center justify-center rounded-xl border border-teal-300/25 bg-teal-300/10 text-teal-300" aria-hidden="true">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="h-6 w-6"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>
                 </span>
                 <span class="text-lg font-semibold tracking-tight">argus<span class="ml-2 text-xs font-normal tracking-wide text-slate-400">MONITORING</span></span>
             </a>
-            {% if user.is_authenticated %}
-                <form method="post" action="{% url 'accounts:logout' %}">
-                    {% csrf_token %}
-                    <button type="submit" class="cursor-pointer rounded-lg border border-white/15 px-4 py-2 text-sm font-medium text-slate-200 transition hover:border-teal-300/50 hover:text-teal-200">Logout</button>
-                </form>
-            {% else %}
-                <a href="{% url 'accounts:register' %}" aria-current="{% block registration_current %}false{% endblock %}" class="rounded-lg border border-white/15 px-4 py-2 text-sm font-medium text-slate-200 transition hover:border-teal-300/50 hover:text-teal-200">Create account <span aria-hidden="true" class="ml-2">↗</span></a>
-            {% endif %}
+            <div class="flex flex-wrap items-center gap-3">
+                {% if user.is_authenticated %}
+                    <a href="{% url 'monitors:list_monitors' %}" class="inline-flex min-h-11 items-center justify-center rounded-lg border border-white/15 px-4 py-2 text-sm font-medium text-slate-200 transition hover:border-teal-300/50 hover:text-teal-200">Monitors</a>
+                    <a href="{% url 'monitors:list_tags' %}" class="inline-flex min-h-11 items-center justify-center rounded-lg border border-white/15 px-4 py-2 text-sm font-medium text-slate-200 transition hover:border-teal-300/50 hover:text-teal-200">Tags</a>
+                    <a href="{% url 'accounts:profile' %}" class="inline-flex min-h-11 items-center justify-center rounded-lg border border-white/15 px-4 py-2 text-sm font-medium text-slate-200 transition hover:border-teal-300/50 hover:text-teal-200">Profile</a>
+                    <form method="post" action="{% url 'accounts:logout' %}">
+                        {% csrf_token %}
+                        <button type="submit" class="cursor-pointer rounded-lg border border-white/15 px-4 py-2 text-sm font-medium text-slate-200 transition hover:border-teal-300/50 hover:text-teal-200">Logout</button>
+                    </form>
+                {% else %}
+                    <a href="{% url 'accounts:login' %}" class="inline-flex min-h-11 items-center justify-center rounded-lg border border-white/15 px-4 py-2 text-sm font-medium text-slate-200 transition hover:border-teal-300/50 hover:text-teal-200">Log in</a>
+                    <a href="{% url 'accounts:register' %}" aria-current="{% block registration_current %}false{% endblock %}" class="rounded-lg border border-white/15 px-4 py-2 text-sm font-medium text-slate-200 transition hover:border-teal-300/50 hover:text-teal-200">Create account <span aria-hidden="true" class="ml-2">↗</span></a>
+                {% endif %}
+            </div>
         </nav>
     </header>
     <main id="main-content" tabindex="-1" class="flex flex-1 flex-col">

@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Monitor · Argus Monitoring{% endblock %}
+
+{% block extra_styles %}
+<style>
+    .monitor-update .form-field input { border-color: #64748b; }
+    .monitor-update .form-field [aria-invalid="true"] { border-color: #fb7185; }
+    .monitor-update :is(input, select, button, a):focus-visible { outline: 2px solid #5eead4; outline-offset: 3px; }
+    .monitor-update input[type="checkbox"] { width: 1.15rem; height: 1.15rem; flex: none; accent-color: #5eead4; }
+    .monitor-update select { width: 100%; border: 1px solid #64748b; border-radius: .75rem; background: #0b1017; color: #e2e8f0; padding: .5rem; }
+    .monitor-update option { padding: .375rem .5rem; }
+    .monitor-update option:checked { background: #245753; color: #fff; }
+    .monitor-update button[type="submit"] { background: #5eead4; color: #042f2e; }
+    .monitor-update button[type="submit"]:hover { background: #99f6e4; }
+    .monitor-update .cancel-link { border-color: #64748b; }
+</style>
+{% endblock %}
+
+{% partialdef feedback %}
+    {% if field.errors %}
+        <ul id="{{ field.auto_id }}_error" role="alert" class="field-errors mt-2">
+            {% for error in field.errors %}<li>{{ error }}</li>{% endfor %}
+        </ul>
+    {% endif %}
+    {% if field.help_text %}<p id="{{ field.auto_id }}_helptext" class="field-help mt-2">{{ field.help_text }}</p>{% endif %}
+{% endpartialdef %}
+
+{% block content %}
+<section aria-labelledby="monitor-update-heading" class="monitor-update relative flex flex-1 items-center overflow-hidden">
+    <div aria-hidden="true" class="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(45,212,191,0.08),transparent_60%)]"></div>
+    <div class="relative mx-auto grid w-full max-w-7xl items-center gap-12 px-5 py-12 sm:px-8 sm:py-16 lg:grid-cols-2 lg:gap-20 lg:py-20">
+        <div class="min-w-0">
+            <p class="mb-3 text-xs font-semibold uppercase tracking-[0.16em] text-teal-300">Your monitoring workspace</p>
+            <h1 id="monitor-update-heading" class="text-4xl font-semibold tracking-tight text-white sm:text-5xl">Edit Monitor</h1>
+            <p class="mt-6 max-w-md text-base leading-relaxed text-slate-400">Update the name, monitored URL, tags, or monitoring state for this service.</p>
+        </div>
+
+        <div class="min-w-0 rounded-2xl border border-white/10 bg-[#111923] p-6 shadow-2xl shadow-black/20 sm:p-8">
+            <h2 class="text-2xl font-semibold tracking-tight text-white">Monitor details</h2>
+            <form method="post" class="mt-7 space-y-5">
+                {% csrf_token %}
+                {% if form.non_field_errors %}
+                    <ul role="alert" class="rounded-lg border border-rose-400/30 bg-rose-400/10 p-4 text-sm text-rose-200">
+                        {% for error in form.non_field_errors %}<li>{{ error }}</li>{% endfor %}
+                    </ul>
+                {% endif %}
+
+                <div class="form-field">
+                    <label for="{{ form.name.id_for_label }}" class="mb-2 block text-sm font-medium text-slate-200">Monitor name (required)</label>
+                    {{ form.name }}
+                    {% with field=form.name %}{% partial feedback %}{% endwith %}
+                </div>
+
+                <div class="form-field">
+                    <label for="{{ form.url.id_for_label }}" class="mb-2 block text-sm font-medium text-slate-200">URL (required)</label>
+                    {{ form.url }}
+                    {% with field=form.url %}{% partial feedback %}{% endwith %}
+                </div>
+
+                <div>
+                    <label class="flex cursor-pointer items-center gap-3 rounded-xl border border-white/15 p-4 text-sm font-medium text-slate-200">
+                        {{ form.is_enabled }} Enable monitoring
+                    </label>
+                    {% with field=form.is_enabled %}{% partial feedback %}{% endwith %}
+                </div>
+
+                <div class="form-field" role="group" aria-labelledby="tags-label" aria-describedby="tags-instructions">
+                    <label id="tags-label" for="{{ form.tags.id_for_label }}" class="mb-2 block text-sm font-medium text-slate-200">Tags (optional)</label>
+                    <p id="tags-instructions" class="field-help mb-2">Choose any tags that apply. On a desktop, hold Ctrl (Command on Mac) while clicking to add or remove individual tags.</p>
+                    {{ form.tags }}
+                    {% with field=form.tags %}{% partial feedback %}{% endwith %}
+                    <a href="{% url 'monitors:list_tags' %}" class="mt-2 inline-flex text-sm font-medium text-teal-300 underline">Manage tags</a>
+                </div>
+
+                <div class="flex flex-col gap-3 border-t border-white/8 pt-6 sm:flex-row">
+                    <button type="submit" class="flex w-full cursor-pointer items-center justify-center rounded-xl bg-teal-300 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-teal-200">Save Changes</button>
+                    <a href="{% url 'monitors:detail_monitor' object.pk %}" class="cancel-link flex w-full items-center justify-center rounded-xl border px-5 py-3 text-sm font-medium text-slate-200 transition hover:text-teal-200">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}

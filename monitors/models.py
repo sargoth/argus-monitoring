@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.core.validators import RegexValidator, MinValueValidator, MaxValueValidator
+from django.core.validators import RegexValidator, MinValueValidator, MaxValueValidator, URLValidator
 from django.db import models
 from django.db.models.functions import Lower
 
@@ -20,6 +20,7 @@ class Monitor(models.Model):
         help_text="Service name"
     )
     url = models.URLField(
+        validators=[URLValidator(schemes=["http", "https"])],
         help_text="URL or API endpoint that will be checked."
     )
     status = models.CharField(

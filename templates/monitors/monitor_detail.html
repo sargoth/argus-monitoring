@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+
+{% block title %}{{ monitor.name }} · Argus Monitoring{% endblock %}
+
+{% block extra_styles %}
+<style>
+    .monitor-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: .5rem;
+        max-width: 100%;
+        padding: .375rem .75rem;
+        border: 1px solid #475569;
+        border-radius: 999px;
+        background: #192430;
+        color: #e2e8f0;
+        font-size: .8125rem;
+        font-weight: 600;
+        line-height: 1.35;
+    }
+
+    .monitor-badge__swatch {
+        width: .875rem;
+        height: .875rem;
+        flex: none;
+        border: 1px solid #94a3b8;
+        border-radius: 50%;
+    }
+
+    .monitor-badge[data-status]::before {
+        content: "";
+        width: .5rem;
+        height: .5rem;
+        flex: none;
+        border-radius: 50%;
+        background: currentColor;
+    }
+
+    .monitor-badge[data-status="up"] { background: #10382a; color: #86efac; border-color: #357754; }
+    .monitor-badge[data-status="down"] { background: #441d25; color: #fda4af; border-color: #9f4758; }
+    .monitor-badge[data-status="pending"] { background: #382c14; color: #fcd34d; border-color: #846526; }
+    .monitor-badge--enabled { background: #103439; color: #99f6e4; border-color: #36777b; }
+    .monitor-badge--disabled { border-style: dashed; color: #cbd5e1; }
+
+    .detail-meta { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(12rem, 100%), 1fr)); gap: 1.5rem; }
+    .detail-meta dt { color: #cbd5e1; font-size: .875rem; }
+    .detail-meta dd { margin-top: .5rem; }
+    .check-history { overflow-x: auto; }
+    .check-history:focus-visible { outline: 2px solid #5eead4; outline-offset: -2px; }
+    .check-history table { width: 100%; border-collapse: collapse; text-align: left; color: #e2e8f0; font-size: .875rem; }
+    .check-history th, .check-history td { padding: 1rem 1.5rem; vertical-align: top; }
+    .check-history th { background: #192430; white-space: nowrap; color: #cbd5e1; }
+    .check-history td { border-top: 1px solid #334155; }
+    .check-history time { white-space: nowrap; }
+    .check-error { min-width: 12rem; overflow-wrap: anywhere; }
+</style>
+{% endblock %}
+
+{% block content %}
+<section aria-labelledby="monitor-heading" class="relative flex flex-1 overflow-hidden">
+    <div aria-hidden="true" class="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(45,212,191,0.08),transparent_60%)]"></div>
+    <div class="relative mx-auto w-full min-w-0 max-w-7xl px-5 py-12 sm:px-8 sm:py-16 lg:py-20">
+        <a href="{% url 'monitors:list_monitors' %}" class="inline-flex items-center gap-2 rounded-sm text-sm font-semibold text-teal-300 hover:text-teal-200">
+            <span aria-hidden="true">←</span> Back to Monitors
+        </a>
+        <h1 id="monitor-heading" class="mt-6 text-4xl font-semibold tracking-tight text-white [overflow-wrap:anywhere] sm:text-5xl">{{ monitor.name }}</h1>
+        <p class="mt-2 text-base text-slate-300 [overflow-wrap:anywhere]"><span class="sr-only">Monitored URL: </span>{{ monitor.url }}</p>
+
+        <div class="mt-4 flex flex-wrap gap-3">
+            <a href="{% url 'monitors:edit_monitor' monitor.pk %}" class="inline-flex min-h-11 items-center justify-center rounded-lg border border-white/15 px-4 py-2 text-sm font-medium text-slate-200 transition hover:border-teal-300/50 hover:text-teal-200">Edit Monitor</a>
+            <a href="{% url 'monitors:delete_monitor' monitor.pk %}" class="inline-flex min-h-11 items-center justify-center rounded-lg delete-action px-4 py-2 text-sm font-semibold transition">Delete Monitor</a>
+        </div>
+
+        <section aria-labelledby="info-heading" class="mt-9 rounded-2xl border border-white/10 bg-[#111923] p-6 shadow-2xl shadow-black/20 sm:p-8">
+            <h2 id="info-heading" class="text-lg font-semibold tracking-tight text-white">Monitor information</h2>
+            <dl class="detail-meta mt-6">
+                <div>
+                    <dt>Recorded status</dt>
+                    <dd><span class="monitor-badge" data-status="{{ monitor.status }}">{{ monitor.get_status_display }}</span></dd>
+                </div>
+                <div>
+                    <dt>Monitoring</dt>
+                    <dd>
+                        {% if monitor.is_enabled %}
+                            <span class="monitor-badge monitor-badge--enabled">Enabled</span>
+                        {% else %}
+                            <span class="monitor-badge monitor-badge--disabled">Disabled</span>
+                        {% endif %}
+                    </dd>
+                </div>
+                <div>
+                    <dt>Created</dt>
+                    <dd class="text-sm text-slate-200"><time datetime="{{ monitor.created_at|date:'c' }}">{{ monitor.created_at|date:"M j, Y · H:i T" }}</time></dd>
+                </div>
+                <div>
+                    <dt>Last updated</dt>
+                    <dd class="text-sm text-slate-200"><time datetime="{{ monitor.updated_at|date:'c' }}">{{ monitor.updated_at|date:"M j, Y · H:i T" }}</time></dd>
+                </div>
+            </dl>
+            <ul aria-label="Tags" class="mt-6 flex flex-wrap gap-2">
+                {% for tag in monitor.tags.all %}
+                    <li class="monitor-badge">
+                        <span aria-hidden="true" class="monitor-badge__swatch" style="background-color: {{ tag.color }};"></span>
+                        <span class="min-w-0 [overflow-wrap:anywhere]">{{ tag.name }}</span>
+                    </li>
+                {% empty %}
+                    <li class="text-sm text-slate-400">No tags assigned</li>
+                {% endfor %}
+            </ul>
+        </section>
+
+        <section class="mt-6 overflow-hidden rounded-2xl border border-white/10 bg-[#111923] shadow-2xl shadow-black/20">
+            <h2 id="checks-heading" class="px-6 py-5 text-lg font-semibold tracking-tight text-white sm:px-8">Recent Checks</h2>
+            <div class="check-history" role="region" aria-labelledby="checks-heading" tabindex="0">
+                <table aria-labelledby="checks-heading">
+                    {% if recent_checks %}
+                    <thead>
+                        <tr>
+                            <th scope="col">Checked at</th>
+                            <th scope="col">Result</th>
+                            <th scope="col">HTTP status</th>
+                            <th scope="col">Response time</th>
+                            <th scope="col">Error details</th>
+                        </tr>
+                    </thead>
+                    {% endif %}
+                    <tbody>
+                    {% for check in recent_checks %}
+                        <tr>
+                            <td><time datetime="{{ check.checked_at|date:'c' }}">{{ check.checked_at|date:"M j, Y · H:i:s T" }}</time></td>
+                            <td>
+                                {% if check.is_successful %}
+                                    <span class="monitor-badge" data-status="up">Successful</span>
+                                {% else %}
+                                    <span class="monitor-badge" data-status="down">Failed</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ check.http_status_code|default_if_none:"N/A" }}</td>
+                            <td>{% if check.response_time_ms != None %}{{ check.response_time_ms }} ms{% else %}N/A{% endif %}</td>
+                            <td class="check-error">{{ check.error_message|default:"—" }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center">
+                                <p class="mt-4 text-lg font-semibold text-white">No checks recorded yet</p>
+                                <p class="mb-4 mt-2 text-sm text-slate-300">The first monitoring check will appear here with its result and response details.</p>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+</section>
+{% endblock %}

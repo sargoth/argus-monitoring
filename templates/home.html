@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Argus Monitoring · Service monitoring{% endblock %}
+
+{% block content %}
+<div class="mx-auto grid w-full max-w-7xl flex-1 items-center gap-12 px-5 py-12 sm:px-8 sm:py-16 lg:grid-cols-2 lg:gap-8">
+    <section aria-labelledby="home-heading">
+        <p class="mb-6 text-xs font-semibold uppercase tracking-[0.18em] text-teal-300">Reliable service monitoring</p>
+        <h1 id="home-heading" class="max-w-lg text-4xl font-semibold leading-[1.12] tracking-tight text-white sm:text-5xl">Know when your services <span class="text-teal-300">go down.</span></h1>
+        <p class="mt-6 max-w-md text-base leading-relaxed text-slate-300">Argus Monitoring is designed to help you monitor websites and API endpoints, track their availability, and understand the health of your services.</p>
+        <div class="mt-7 flex flex-wrap gap-3">
+            {% if user.is_authenticated %}
+                <a href="{% url 'monitors:list_monitors' %}" class="inline-flex min-h-11 items-center rounded-xl bg-teal-300 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-teal-200">Go to Monitors</a>
+            {% else %}
+                <a href="{% url 'accounts:register' %}" class="inline-flex min-h-11 items-center rounded-xl bg-teal-300 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-teal-200">Get Started</a>
+            {% endif %}
+        </div>
+    </section>
+
+    <section aria-labelledby="features-heading">
+        <h2 id="features-heading" class="mb-6 text-2xl font-semibold tracking-tight text-white">Workspace capabilities</h2>
+        <ul class="grid gap-3 sm:grid-cols-2">
+            <li class="rounded-xl border border-white/10 bg-[#111923] p-5">
+                <h3 class="text-lg font-semibold text-white">Monitor Organization</h3>
+                <p class="mt-2 text-sm leading-relaxed text-slate-400">Group services by team or environment with customizable, color-coded tags.</p>
+            </li>
+            <li class="rounded-xl border border-white/10 bg-[#111923] p-5">
+                <h3 class="text-lg font-semibold text-white">Uptime Monitoring</h3>
+                <p class="mt-2 text-sm leading-relaxed text-slate-400">Planned availability checks will track whether your websites and API endpoints are reachable.</p>
+            </li>
+            <li class="rounded-xl border border-white/10 bg-[#111923] p-5">
+                <h3 class="text-lg font-semibold text-white">Performance Tracking</h3>
+                <p class="mt-2 text-sm leading-relaxed text-slate-400">Planned response-time tracking will show how quickly your services respond over time.</p>
+            </li>
+            <li class="rounded-xl border border-white/10 bg-[#111923] p-5">
+                <h3 class="text-lg font-semibold text-white">Incident Management</h3>
+                <p class="mt-2 text-sm leading-relaxed text-slate-400">Planned incident tracking will help you identify outages and follow them through recovery.</p>
+            </li>
+        </ul>
+    </section>
+</div>
+{% endblock %}

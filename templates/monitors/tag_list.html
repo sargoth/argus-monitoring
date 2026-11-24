@@ -40,6 +40,10 @@
                                 </div>
                             </dl>
                         </div>
+                        <div class="mt-4 flex flex-wrap gap-3">
+                            <a href="{% url 'monitors:edit_tag' tag.pk %}" class="inline-flex min-h-11 items-center justify-center rounded-lg border border-white/15 px-4 py-2 text-sm font-medium text-slate-200 transition hover:border-teal-300/50 hover:text-teal-200">Edit<span class="sr-only"> {{ tag.name }}</span></a>
+                            <a href="{% url 'monitors:delete_tag' tag.pk %}" class="inline-flex min-h-11 items-center justify-center rounded-lg delete-action px-4 py-2 text-sm font-semibold transition">Delete Tag<span class="sr-only"> {{ tag.name }}</span></a>
+                        </div>
                     </li>
                 {% empty %}
                     <li class="px-6 py-12 text-center sm:px-8 sm:py-16">

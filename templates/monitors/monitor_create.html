@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}Create Monitor · Argus Monitoring{% endblock %}
+
+{% block extra_styles %}
+<style>
+    .monitor-create .form-field input { border-color: #64748b; }
+    .monitor-create input[aria-invalid="true"] { border-color: #fb7185; }
+    .monitor-create input:focus-visible { outline: 2px solid #5eead4; outline-offset: 3px; }
+    .monitor-create input[type="checkbox"] { width: 1.15rem; height: 1.15rem; flex: none; accent-color: #5eead4; }
+    .monitor-create .tag-options { display: grid; gap: .5rem; max-height: 14rem; overflow-y: auto; padding: .375rem; }
+    .monitor-create .tag-option { display: flex; align-items: center; gap: .75rem; padding: .625rem .75rem; border: 1px solid #64748b; border-radius: .65rem; cursor: pointer; }
+    .monitor-create .tag-option:has(:checked) { background: #103439; border-color: #5eead4; }
+    .monitor-create .cancel-link { border-color: #64748b; }
+</style>
+{% endblock %}
+
+{% partialdef feedback %}
+    {% if field.errors %}
+        <ul id="{{ field.auto_id }}_error" role="alert" class="field-errors mt-2">
+            {% for error in field.errors %}<li>{{ error }}</li>{% endfor %}
+        </ul>
+    {% endif %}
+    {% if field.help_text %}<p id="{{ field.auto_id }}_helptext" class="field-help mt-2">{{ field.help_text }}</p>{% endif %}
+{% endpartialdef %}
+
+{% block content %}
+<section aria-labelledby="monitor-create-heading" class="monitor-create relative flex flex-1 items-center overflow-hidden">
+    <div aria-hidden="true" class="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(45,212,191,0.08),transparent_60%)]"></div>
+    <div class="relative mx-auto grid w-full max-w-7xl items-center gap-12 px-5 py-12 sm:px-8 sm:py-16 lg:grid-cols-2 lg:gap-20 lg:py-20">
+        <div class="min-w-0">
+            <p class="mb-3 text-xs font-semibold uppercase tracking-[0.16em] text-teal-300">Your monitoring workspace</p>
+            <h1 id="monitor-create-heading" class="text-4xl font-semibold tracking-tight text-white sm:text-5xl">Create Monitor</h1>
+            <p class="mt-6 max-w-md text-base leading-relaxed text-slate-400">Add a website or API endpoint to monitor its availability.</p>
+        </div>
+
+        <div class="min-w-0 rounded-2xl border border-white/10 bg-[#111923] p-6 shadow-2xl shadow-black/20 sm:p-8">
+            <h2 class="text-2xl font-semibold tracking-tight text-white">Monitor details</h2>
+            <form method="post" action="{% url 'monitors:create_monitor' %}" class="mt-7 space-y-5">
+                {% csrf_token %}
+                {% if form.non_field_errors %}
+                    <ul role="alert" class="rounded-lg border border-rose-400/30 bg-rose-400/10 p-4 text-sm text-rose-200">
+                        {% for error in form.non_field_errors %}<li>{{ error }}</li>{% endfor %}
+                    </ul>
+                {% endif %}
+
+                <div class="form-field">
+                    <label for="{{ form.name.id_for_label }}" class="mb-2 block text-sm font-medium text-slate-200">Monitor name (required)</label>
+                    {{ form.name }}
+                    {% with field=form.name %}{% partial feedback %}{% endwith %}
+                </div>
+
+                <div class="form-field">
+                    <label for="{{ form.url.id_for_label }}" class="mb-2 block text-sm font-medium text-slate-200">URL (required)</label>
+                    {% with widget=form.url.0.data %}
+                        <input type="{{ widget.type }}" name="{{ widget.name }}" placeholder="https://example.com"{% if widget.value != None %} value="{{ widget.value }}"{% endif %}{% for key, value in widget.attrs.items %}{% if value is not False %} {{ key }}{% if value is not True %}="{{ value }}"{% endif %}{% endif %}{% endfor %}>
+                    {% endwith %}
+                    {% with field=form.url %}{% partial feedback %}{% endwith %}
+                </div>
+
+                <div>
+                    <label class="flex cursor-pointer items-center gap-3 rounded-xl border border-white/15 p-4 text-sm font-medium text-slate-200">
+                        {{ form.is_enabled }} Enable monitoring
+                    </label>
+                    {% with field=form.is_enabled %}{% partial feedback %}{% endwith %}
+                </div>
+
+                <fieldset class="min-w-0" aria-describedby="tag-instructions {{ form.tags.aria_describedby }}">
+                    <legend class="text-sm font-medium text-slate-200">Tags (optional)</legend>
+                    <p id="tag-instructions" class="field-help mt-2">Check any tags that apply, or leave them all unselected.</p>
+                    <div class="tag-options mt-2">
+                        {% for option in form.tags %}
+                            <label class="tag-option text-sm text-slate-200">
+                                <input type="checkbox" name="{{ option.data.name }}" value="{{ option.data.value }}"{% if option.data.selected %} checked{% endif %}>
+                                <span class="min-w-0 [overflow-wrap:anywhere]">{{ option.choice_label }}</span>
+                            </label>
+                        {% empty %}
+                            <p class="text-sm text-slate-400">No tags available yet.</p>
+                        {% endfor %}
+                    </div>
+                    {% with field=form.tags %}{% partial feedback %}{% endwith %}
+                    <a href="{% url 'monitors:list_tags' %}" class="mt-2 inline-flex text-sm font-medium text-teal-300 underline">Manage tags</a>
+                </fieldset>
+
+                <div class="flex flex-col gap-3 border-t border-white/8 pt-6 sm:flex-row">
+                    <button type="submit" class="flex w-full cursor-pointer items-center justify-center rounded-xl bg-teal-300 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-teal-200">Create Monitor</button>
+                    <a href="{% url 'monitors:list_monitors' %}" class="cancel-link flex w-full items-center justify-center rounded-xl border px-5 py-3 text-sm font-medium text-slate-200 transition hover:text-teal-200">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}

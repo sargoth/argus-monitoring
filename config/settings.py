@@ -137,7 +137,7 @@ STATICFILES_DIRS = [
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 LOGIN_URL = 'accounts:login'
-LOGIN_REDIRECT_URL = 'accounts:profile'
+LOGIN_REDIRECT_URL = 'monitors:list_monitors'
 LOGOUT_REDIRECT_URL = 'accounts:login'
 
 # Email
